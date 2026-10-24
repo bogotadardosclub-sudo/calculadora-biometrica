@@ -260,4 +260,165 @@
         btn.innerText = "Métrico (kg/cm)";
         document.getElementById('lbl-peso').innerText = "Peso (kg)";
         document.getElementById('lbl-estatura').innerText = "Estatura (cm)";
-        document.
+        document.getElementById('lbl-muneca').innerText = "Muñeca (cm)";
+        if (!isNaN(peso)) document.getElementById('peso').value = (peso / 2.20462).toFixed(1);
+        if (!isNaN(estatura)) document.getElementById('estatura').value = (estatura * 2.54).toFixed(1);
+        if (!isNaN(muneca)) document.getElementById('muneca').value = (muneca * 2.54).toFixed(1);
+      }
+      calcular();
+    }
+
+    function calcular() {
+      const nombreInput = document.getElementById('nombre').value.trim();
+      const genero = document.getElementById('genero').value;
+      const edad = parseFloat(document.getElementById('edad').value);
+      const peso = parseFloat(document.getElementById('peso').value);
+      const estatura = parseFloat(document.getElementById('estatura').value);
+      const muneca = parseFloat(document.getElementById('muneca').value);
+      const factorActividad = parseFloat(document.getElementById('actividad').value) || 1.375;
+      const fcReposo = parseFloat(document.getElementById('fc_reposo').value) || 65;
+      const deficitPct = parseFloat(document.getElementById('deficit_pct').value) || 0.20;
+
+      // Si faltan datos básicos de cálculo, mantener estado neutro de espera
+      if (isNaN(peso) || isNaN(estatura) || isNaN(edad) || peso <= 0 || estatura <= 0 || edad <= 0) {
+        document.getElementById('res-nombre').innerText = nombreInput || "Tu Nombre";
+        document.getElementById('res-meta-perfil').innerText = `${genero === 'hombre' ? 'Hombre' : 'Mujer'} | Esperando peso, estatura y edad...`;
+        document.getElementById('res-imc').innerText = "--";
+        document.getElementById('res-imc-rango').innerText = "(Sin datos)";
+        document.getElementById('res-gc').innerText = "--";
+        document.getElementById('res-gc-rango').innerText = "(Sin datos)";
+        document.getElementById('res-peso-meta').innerText = "--";
+        document.getElementById('res-kilos-perder').innerText = "(Dif: --)";
+        document.getElementById('res-tmb').innerText = "-- Kcal";
+        document.getElementById('res-get').innerText = "-- Kcal";
+        document.getElementById('res-meta-kcal').innerText = "-- Kcal";
+        document.getElementById('res-deficit-info').innerText = "(Esperando datos)";
+        document.getElementById('res-macro-prot').innerText = "-- g";
+        document.getElementById('res-macro-grasas').innerText = "-- g";
+        document.getElementById('res-macro-carbs').innerText = "-- g";
+        document.getElementById('res-fc-zona2').innerText = "-- ppm";
+        document.getElementById('res-agua').innerText = "-- L / día";
+        document.getElementById('res-tiempo').innerText = "Proyección: --";
+        return;
+      }
+
+      let pesoKg = currentUnits === 'imperial' ? peso / 2.20462 : peso;
+      let estaturaCm = currentUnits === 'imperial' ? estatura * 2.54 : estatura;
+      let munecaCm = currentUnits === 'imperial' ? (!isNaN(muneca) ? muneca * 2.54 : 17.5) : (!isNaN(muneca) ? muneca : 17.5);
+
+      // Complexión Ósea (Grant)
+      let rGrant = estaturaCm / munecaCm;
+      let contextura = "Mediana";
+      if (genero === 'hombre') {
+        if (rGrant > 10.4) contextura = "Pequeña";
+        else if (rGrant < 9.6) contextura = "Grande";
+      } else {
+        if (rGrant > 11.0) contextura = "Pequeña";
+        else if (rGrant < 10.1) contextura = "Grande";
+      }
+
+      // IMC y Clasificación
+      let imc = pesoKg / ((estaturaCm / 100) ** 2);
+      let imcRango = "(Normopeso)";
+      let imcColor = "text-emerald-600";
+      if (imc < 18.5) { imcRango = "(Bajo Peso)"; imcColor = "text-amber-600"; }
+      else if (imc >= 25 && imc < 30) { imcRango = "(Sobrepeso)"; imcColor = "text-amber-600"; }
+      else if (imc >= 30) { imcRango = "(Obesidad)"; imcColor = "text-rose-600"; }
+
+      // % Grasa (Deurenberg)
+      let sexoFactor = genero === 'hombre' ? 1 : 0;
+      let gc = (1.20 * imc) + (0.23 * edad) - (10.8 * sexoFactor) - 5.4;
+      let gcRango = "(Normal)";
+      let gcColor = "text-emerald-600";
+      if (genero === 'hombre') {
+        if (gc > 25) { gcRango = "(Elevado)"; gcColor = "text-rose-600"; }
+      } else {
+        if (gc > 32) { gcRango = "(Elevado)"; gcColor = "text-rose-600"; }
+      }
+
+      // Peso Meta OMS
+      let imcTarget = 24.5;
+      if (contextura === "Grande") imcTarget = 24.9;
+      if (contextura === "Pequeña") imcTarget = 22.5;
+      let pesoMetaKg = imcTarget * ((estaturaCm / 100) ** 2);
+      let difPesoKg = pesoMetaKg - pesoKg;
+
+      // Gasto Energético (Mifflin-St Jeor)
+      let tmb = (10 * pesoKg) + (6.25 * estaturaCm) - (5 * edad) + (genero === 'hombre' ? 5 : -161);
+      let get = tmb * factorActividad;
+      let metaKcal = get * (1 - deficitPct);
+
+      // Macros
+      let protGramos = pesoKg * 1.8;
+      let grasaKcal = metaKcal * 0.28;
+      let grasaGramos = grasaKcal / 9;
+      let carbKcal = Math.max(0, metaKcal - (protGramos * 4) - grasaKcal);
+      let carbGramos = carbKcal / 4;
+
+      // Cardio (Tanaka & Karvonen)
+      let fcMax = Math.round(208 - (0.7 * edad));
+      let fcReserva = fcMax - fcReposo;
+      let z2Min = Math.round((fcReserva * 0.60) + fcReposo);
+      let z2Max = Math.round((fcReserva * 0.70) + fcReposo);
+
+      // Hidratación y Tiempo
+      let aguaLitros = ((pesoKg * 35) / 1000).toFixed(1);
+      let tiempoTexto = "Meta alcanzada";
+      if (difPesoKg < -0.5) {
+        let deficitDiario = get - metaKcal;
+        if (deficitDiario > 0) {
+          let semanas = Math.round((Math.abs(difPesoKg) * 7700) / (deficitDiario * 7));
+          tiempoTexto = `~${semanas} semanas`;
+        }
+      }
+
+      // Volcado a la tarjeta
+      document.getElementById('res-nombre').innerText = nombreInput || "Usuario";
+      document.getElementById('res-meta-perfil').innerText = `${genero === 'hombre' ? 'Hombre' : 'Mujer'}, ${edad} años | Complexión ${contextura}`;
+      document.getElementById('res-imc').innerText = imc.toFixed(1);
+      document.getElementById('res-imc-rango').innerText = imcRango;
+      document.getElementById('res-imc-rango').className = `text-[10px] font-bold ${imcColor} block`;
+
+      document.getElementById('res-gc').innerText = `${gc.toFixed(1)}%`;
+      document.getElementById('res-gc-rango').innerText = gcRango;
+      document.getElementById('res-gc-rango').className = `text-[10px] font-bold ${gcColor} block`;
+
+      let displayPesoMeta = currentUnits === 'imperial' ? (pesoMetaKg * 2.20462).toFixed(1) + " lb" : pesoMetaKg.toFixed(1) + " kg";
+      let displayDif = currentUnits === 'imperial' ? (difPesoKg * 2.20462).toFixed(1) + " lb" : difPesoKg.toFixed(1) + " kg";
+      document.getElementById('res-peso-meta').innerText = displayPesoMeta;
+      document.getElementById('res-kilos-perder').innerText = `(Dif: ${displayDif})`;
+
+      document.getElementById('res-tmb').innerText = `${Math.round(tmb).toLocaleString()} Kcal`;
+      document.getElementById('res-get').innerText = `${Math.round(get).toLocaleString()} Kcal`;
+      document.getElementById('res-meta-kcal').innerText = `${Math.round(metaKcal).toLocaleString()} Kcal`;
+      document.getElementById('res-deficit-info').innerText = deficitPct > 0 ? `(Déficit: -${Math.round(deficitPct * 100)}%)` : "(Mantenimiento)";
+
+      document.getElementById('res-macro-prot').innerText = `${Math.round(protGramos)} g`;
+      document.getElementById('res-macro-grasas').innerText = `${Math.round(grasaGramos)} g`;
+      document.getElementById('res-macro-carbs').innerText = `${Math.round(carbGramos)} g`;
+
+      document.getElementById('res-fc-zona2').innerText = `${z2Min} - ${z2Max} ppm`;
+      document.getElementById('res-agua').innerText = `${aguaLitros} L / día`;
+      document.getElementById('res-tiempo').innerText = tiempoTexto;
+    }
+
+    function descargarImagen() {
+      const card = document.getElementById('card-render');
+      html2canvas(card, {
+        scale: 3,
+        backgroundColor: '#092347',
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `biometria_${new Date().toISOString().slice(0,10)}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    window.onload = function() {
+      calcular();
+    };
+  </script>
+</body>
+</html>
