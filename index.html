@@ -3,52 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Evaluación Antropométrica y Gasto Energético</title>
+  <title>Evaluación Antropométrica & Metabolismo</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- html2canvas para generación de imagen -->
+  <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01); }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .glass-card { background: rgba(255, 255, 255, 0.90); backdrop-filter: blur(12px); }
+    .card-shadow { box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03); }
+    .input-field {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.875rem;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+      background-color: #f8fafc;
+      transition: all 0.15s ease-in-out;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen pb-12">
+<body class="bg-gradient-to-br from-slate-50 via-slate-100 to-indigo-50/40 text-slate-800 antialiased min-h-screen pb-16">
 
-  <!-- Encabezado Móvil -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3 flex justify-between items-center shadow-sm">
-    <div class="flex items-center space-x-2">
-      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg">M</div>
-      <h1 class="font-bold text-slate-900 text-base sm:text-lg">Metabolismo & Biometría</h1>
-    </div>
-    <!-- Selector Métrico / Imperial -->
-    <div class="bg-slate-100 p-1 rounded-lg flex items-center border border-slate-200 text-xs font-semibold">
-      <button id="btn-metric" onclick="setUnits('metric')" class="px-2.5 py-1 rounded-md bg-white text-blue-600 shadow-sm transition">Métrico (kg/cm)</button>
-      <button id="btn-imperial" onclick="setUnits('imperial')" class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition">Imperial (lb/in)</button>
+  <!-- Header Sticky con Blur -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-4 py-3 shadow-sm">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">Biometría & Salud</h1>
+          <p class="text-[10px] text-slate-500 font-medium hidden sm:block">Motor clínico validado (Mifflin-St Jeor & Tanaka)</p>
+        </div>
+      </div>
+      
+      <!-- Selector Unidades -->
+      <div class="bg-slate-200/70 p-1 rounded-xl flex items-center text-xs font-semibold">
+        <button id="btn-metric" onclick="setUnits('metric')" class="px-3 py-1 rounded-lg bg-white text-blue-600 shadow-sm transition">Métrico (kg/cm)</button>
+        <button id="btn-imperial" onclick="setUnits('imperial')" class="px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition">Imperial (lb/in)</button>
+      </div>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto px-4 py-6 space-y-6">
 
-    <!-- Formulario de Entrada de Datos -->
-    <section class="bg-white rounded-2xl p-5 border border-slate-200 card-shadow space-y-5">
-      <div class="border-b border-slate-100 pb-3">
-        <h2 class="font-semibold text-slate-800 text-base">Parámetros Antropométricos</h2>
-        <p class="text-xs text-slate-500">Los datos se procesan localmente en tu dispositivo. Ninguna información se almacena en servidores externos.</p>
+    <!-- Formulario Interactivo -->
+    <section class="glass-card rounded-2xl p-6 border border-slate-200/80 card-shadow space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h2 class="font-bold text-slate-900 text-base">Datos de Evaluación</h2>
+          <p class="text-xs text-slate-500">Los cálculos se actualizan de forma automática en tiempo real.</p>
+        </div>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          100% Privado
+        </span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Nombre / Identificador -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Nombre o Referencia</label>
-          <input type="text" id="nombre" value="Usuario de Prueba" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- Nombre -->
+        <div class="sm:col-span-2 md:col-span-1">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre o Alias</label>
+          <input type="text" id="nombre" value="Usuario" oninput="calcular()" class="input-field">
         </div>
 
-        <!-- Género Biológico -->
+        <!-- Género -->
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Género Biológico</label>
-          <select id="genero" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Género Biológico</label>
+          <select id="genero" onchange="calcular()" class="input-field bg-white">
             <option value="hombre">Hombre</option>
             <option value="mujer">Mujer</option>
           </select>
@@ -56,195 +87,205 @@
 
         <!-- Edad -->
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Edad (años)</label>
-          <input type="number" id="edad" value="40" min="15" max="100" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Edad (años)</label>
+          <input type="number" id="edad" value="40" min="15" max="100" oninput="calcular()" class="input-field">
         </div>
 
         <!-- Peso -->
         <div>
-          <label id="lbl-peso" class="block text-xs font-medium text-slate-600 mb-1">Peso (kg)</label>
-          <input type="number" step="0.1" id="peso" value="75.0" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label id="lbl-peso" class="block text-xs font-semibold text-slate-700 mb-1">Peso (kg)</label>
+          <input type="number" step="0.1" id="peso" value="78.0" oninput="calcular()" class="input-field">
         </div>
 
         <!-- Estatura -->
         <div>
-          <label id="lbl-estatura" class="block text-xs font-medium text-slate-600 mb-1">Estatura (cm)</label>
-          <input type="number" step="0.5" id="estatura" value="175" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label id="lbl-estatura" class="block text-xs font-semibold text-slate-700 mb-1">Estatura (cm)</label>
+          <input type="number" step="0.5" id="estatura" value="175" oninput="calcular()" class="input-field">
         </div>
 
-        <!-- Circunferencia de Muñeca -->
+        <!-- Circunferencia Muñeca -->
         <div>
-          <label id="lbl-muneca" class="block text-xs font-medium text-slate-600 mb-1">Circunferencia de Muñeca (cm)</label>
-          <input type="number" step="0.1" id="muneca" value="17.5" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label id="lbl-muneca" class="block text-xs font-semibold text-slate-700 mb-1">Muñeca (cm)</label>
+          <input type="number" step="0.1" id="muneca" value="17.5" oninput="calcular()" class="input-field">
         </div>
 
-        <!-- Nivel de Actividad -->
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Nivel de Actividad Física</label>
-          <select id="actividad" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-            <option value="1.2">Sedentario (poco o nada de ejercicio)</option>
-            <option value="1.375" selected>Levemente activo (1 a 3 días/semana)</option>
-            <option value="1.55">Moderadamente activo (3 a 5 días/semana)</option>
-            <option value="1.725">Muy activo (6 a 7 días/semana)</option>
-            <option value="1.9">Atleta / Hiperactivo (doble sesión diaria)</option>
+        <!-- Nivel Actividad -->
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nivel de Actividad Física Habitual</label>
+          <select id="actividad" onchange="calcular()" class="input-field bg-white">
+            <option value="1.2">Sedentario (trabajo de escritorio, poco o ningún ejercicio)</option>
+            <option value="1.375" selected>Levemente activo (ejercicios suaves 1 a 3 veces/semana)</option>
+            <option value="1.55">Moderadamente activo (ejercicio moderado 3 a 5 veces/semana)</option>
+            <option value="1.725">Muy activo (ejercicio intenso 6 a 7 veces/semana)</option>
+            <option value="1.9">Atleta profesional / Trabajo físico muy pesado</option>
           </select>
         </div>
 
-        <!-- Frecuencia Cardíaca en Reposo -->
+        <!-- FC Reposo -->
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">FC en Reposo (opcional, ppm)</label>
-          <input type="number" id="fc_reposo" value="65" min="40" max="120" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">FC en Reposo (ppm)</label>
+          <input type="number" id="fc_reposo" value="65" min="40" max="110" oninput="calcular()" class="input-field">
         </div>
 
-        <!-- Agresividad del Déficit -->
-        <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-slate-600 mb-1">Objetivo Calórico (Déficit / Superávit)</label>
-          <select id="deficit_pct" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-            <option value="0">Mantenimiento (0% déficit)</option>
-            <option value="0.10">Pérdida Conservadora (-10% déficit)</option>
-            <option value="0.20" selected>Pérdida Moderada (-20% déficit - Estándar)</option>
-            <option value="0.25">Pérdida Agresiva (-25% déficit)</option>
+        <!-- Selector Déficit -->
+        <div class="sm:col-span-2 md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Estrategia Nutricional Deseada</label>
+          <select id="deficit_pct" onchange="calcular()" class="input-field bg-white font-medium text-blue-900">
+            <option value="0">Mantenimiento de Peso (0% de déficit)</option>
+            <option value="0.10">Pérdida Gradual / Conservadora (-10% déficit calórico)</option>
+            <option value="0.20" selected>Pérdida Moderada Recomendada (-20% déficit calórico)</option>
+            <option value="0.25">Pérdida Acelerada (-25% déficit calórico)</option>
           </select>
         </div>
       </div>
-
-      <button onclick="calcular()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition shadow-md flex items-center justify-center space-x-2">
-        <span>Actualizar Análisis</span>
-      </button>
     </section>
 
-    <!-- FICHA RESUMEN PARA DESCARGA (TARJETA VISUAL) -->
-    <div id="resultado-container" class="space-y-4">
-      <div class="flex justify-between items-center">
-        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Tarjeta de Resultados</h3>
-        <button onclick="descargarImagen()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center space-x-1.5">
+    <!-- FICHA DE RESULTADOS / TARJETA EXPORTABLE -->
+    <div class="space-y-3">
+      <div class="flex justify-between items-center px-1">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1.5">
+          <span class="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
+          <span>Ficha de Resultados</span>
+        </h3>
+        <button onclick="descargarImagen()" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center space-x-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-          <span>Descargar como Imagen (PNG)</span>
+          <span>Descargar Imagen (PNG)</span>
         </button>
       </div>
 
       <!-- Tarjeta renderizable -->
-      <div id="card-render" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 max-w-2xl mx-auto">
+      <div id="card-render" class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xl shadow-slate-200/60 space-y-6 max-w-2xl mx-auto relative overflow-hidden">
+        <!-- Acento estético superior -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500"></div>
+
         <!-- Encabezado de la Tarjeta -->
-        <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+        <div class="flex justify-between items-start border-b border-slate-100 pb-4 pt-1">
           <div>
-            <h2 id="res-nombre" class="text-xl font-bold text-slate-900">Usuario de Prueba</h2>
-            <p id="res-meta-perfil" class="text-xs text-slate-500 mt-0.5">Hombre, 40 años | Complexión Mediana</p>
+            <span class="text-[10px] font-bold tracking-wider text-blue-600 uppercase">Informe Antropométrico & Energético</span>
+            <h2 id="res-nombre" class="text-2xl font-extrabold text-slate-900 mt-0.5">Usuario</h2>
+            <p id="res-meta-perfil" class="text-xs font-medium text-slate-500 mt-0.5">Hombre, 40 años | Complexión Mediana</p>
           </div>
           <div class="text-right">
-            <span class="inline-block px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200" id="res-fecha">24 Octubre 2026</span>
+            <span id="res-fecha" class="inline-block px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/70">Fecha</span>
           </div>
         </div>
 
-        <!-- Cuadrante 1: Composición Corporal e IMC -->
-        <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-            <div class="text-[11px] font-semibold text-slate-500">IMC Actual</div>
-            <div id="res-imc" class="text-lg font-bold text-slate-800 mt-0.5">24.5</div>
-            <div id="res-imc-rango" class="text-[10px] font-bold text-emerald-600 mt-0.5">Normopeso</div>
+        <!-- Cuadrante 1: Métricas de Composición -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-gradient-to-b from-slate-50 to-slate-100/60 p-3.5 rounded-2xl border border-slate-200/60 text-center">
+            <span class="text-[11px] font-semibold text-slate-500 block">IMC Actual</span>
+            <span id="res-imc" class="text-xl font-extrabold text-slate-900 block mt-0.5">25.5</span>
+            <span id="res-imc-rango" class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 bg-amber-50 text-amber-700 border border-amber-200">Sobrepeso</span>
           </div>
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-            <div class="text-[11px] font-semibold text-slate-500">% Grasa Estimado</div>
-            <div id="res-gc" class="text-lg font-bold text-slate-800 mt-0.5">18.2%</div>
-            <div id="res-gc-rango" class="text-[10px] font-bold text-emerald-600 mt-0.5">Normal</div>
+          <div class="bg-gradient-to-b from-slate-50 to-slate-100/60 p-3.5 rounded-2xl border border-slate-200/60 text-center">
+            <span class="text-[11px] font-semibold text-slate-500 block">% Grasa Est.</span>
+            <span id="res-gc" class="text-xl font-extrabold text-slate-900 block mt-0.5">21.4%</span>
+            <span id="res-gc-rango" class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200">Normal</span>
           </div>
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-            <div class="text-[11px] font-semibold text-slate-500">Peso Objetivo</div>
-            <div id="res-peso-meta" class="text-lg font-bold text-blue-600 mt-0.5">72.0 kg</div>
-            <div id="res-kilos-perder" class="text-[10px] font-medium text-slate-500 mt-0.5">Diferencia: -3.0 kg</div>
+          <div class="bg-gradient-to-b from-blue-50/50 to-indigo-50/40 p-3.5 rounded-2xl border border-blue-100 text-center">
+            <span class="text-[11px] font-semibold text-blue-700 block">Peso Meta OMS</span>
+            <span id="res-peso-meta" class="text-xl font-extrabold text-blue-900 block mt-0.5">76.3 kg</span>
+            <span id="res-kilos-perder" class="text-[10px] font-medium text-slate-500 block mt-1">Dif: -1.7 kg</span>
           </div>
         </div>
 
-        <!-- Cuadrante 2: Balance Energético -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Balance Calórico Diario</h4>
+        <!-- Cuadrante 2: Balance Calórico Diario -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Planificación Energética</h4>
+            <span class="text-[11px] text-slate-400 font-medium">Mifflin-St Jeor</span>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="p-3 rounded-xl border border-slate-100 bg-slate-50">
-              <span class="text-[11px] text-slate-500 block">Metabolismo Basal (TMB)</span>
-              <span id="res-tmb" class="text-base font-bold text-slate-800">1,680 Kcal</span>
-              <span class="text-[10px] text-slate-400 block mt-0.5">Fórmula Mifflin-St Jeor</span>
+            <div class="p-3.5 rounded-2xl border border-slate-200/60 bg-slate-50/80">
+              <span class="text-[11px] font-medium text-slate-500 block">Gasto Basal (TMB)</span>
+              <span id="res-tmb" class="text-lg font-bold text-slate-900 block mt-0.5">1,725 Kcal</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Reposo absoluto</span>
             </div>
-            <div class="p-3 rounded-xl border border-slate-100 bg-slate-50">
-              <span class="text-[11px] text-slate-500 block">Gasto Total Diario (GET)</span>
-              <span id="res-get" class="text-base font-bold text-slate-800">2,310 Kcal</span>
-              <span class="text-[10px] text-slate-400 block mt-0.5">Incluye actividad física</span>
+            <div class="p-3.5 rounded-2xl border border-slate-200/60 bg-slate-50/80">
+              <span class="text-[11px] font-medium text-slate-500 block">Gasto Total (GET)</span>
+              <span id="res-get" class="text-lg font-bold text-slate-900 block mt-0.5">2,372 Kcal</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Con actividad física</span>
             </div>
-            <div class="p-3 rounded-xl border border-blue-200 bg-blue-50/70">
-              <span class="text-[11px] text-blue-700 font-semibold block">Consumo Diario Sugerido</span>
-              <span id="res-meta-kcal" class="text-lg font-bold text-blue-800">1,848 Kcal</span>
-              <span id="res-deficit-info" class="text-[10px] text-blue-600 block mt-0.5">Déficit programado: -20%</span>
+            <div class="p-3.5 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50/60 shadow-sm">
+              <span class="text-[11px] font-bold text-blue-700 block">Consumo Diario</span>
+              <span id="res-meta-kcal" class="text-xl font-extrabold text-blue-900 block mt-0.5">1,898 Kcal</span>
+              <span id="res-deficit-info" class="text-[10px] font-semibold text-blue-600 block mt-0.5">Déficit: -20%</span>
             </div>
           </div>
         </div>
 
-        <!-- Cuadrante 3: Distribución de Macronutrientes -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Distribución Sugerida de Macronutrientes</h4>
+        <!-- Cuadrante 3: Macronutrientes -->
+        <div class="space-y-2.5">
+          <div class="flex justify-between items-center">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Distribución de Macronutrientes</h4>
+            <span class="text-[11px] text-slate-400 font-medium">Proteína protegida (1.8g/kg)</span>
+          </div>
           <div class="grid grid-cols-3 gap-3 text-center">
-            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
-              <span class="text-[10px] font-semibold text-slate-500 block">Proteína (1.8g/kg)</span>
-              <span id="res-macro-prot" class="text-sm font-bold text-slate-800">135 g</span>
-              <span id="res-macro-prot-kcal" class="text-[10px] text-slate-400 block">540 Kcal (29%)</span>
+            <div class="p-3 rounded-2xl border border-blue-100 bg-blue-50/40">
+              <span class="text-[11px] font-bold text-blue-800 block">Proteína</span>
+              <span id="res-macro-prot" class="text-base font-extrabold text-slate-900 mt-0.5 block">140 g</span>
+              <span id="res-macro-prot-kcal" class="text-[10px] text-slate-500 block">560 Kcal (30%)</span>
             </div>
-            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
-              <span class="text-[10px] font-semibold text-slate-500 block">Grasas Saludables</span>
-              <span id="res-macro-grasas" class="text-sm font-bold text-slate-800">55 g</span>
-              <span id="res-macro-grasas-kcal" class="text-[10px] text-slate-400 block">495 Kcal (27%)</span>
+            <div class="p-3 rounded-2xl border border-amber-100 bg-amber-50/40">
+              <span class="text-[11px] font-bold text-amber-800 block">Grasas</span>
+              <span id="res-macro-grasas" class="text-base font-extrabold text-slate-900 mt-0.5 block">59 g</span>
+              <span id="res-macro-grasas-kcal" class="text-[10px] text-slate-500 block">531 Kcal (28%)</span>
             </div>
-            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50">
-              <span class="text-[10px] font-semibold text-slate-500 block">Carbohidratos</span>
-              <span id="res-macro-carbs" class="text-sm font-bold text-slate-800">203 g</span>
-              <span id="res-macro-carbs-kcal" class="text-[10px] text-slate-400 block">813 Kcal (44%)</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cuadrante 4: Frecuencia Cardíaca y Zonas de Entrenamiento -->
-        <div class="space-y-2">
-          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Zonas Cardíacas (Tanaka & Karvonen)</h4>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-              <span class="text-[11px] text-slate-500 block">FC Máxima Teórica</span>
-              <span id="res-fc-max" class="text-base font-bold text-slate-800">180 ppm</span>
-              <span class="text-[10px] text-slate-400 block mt-0.5">208 - (0.7 × edad)</span>
-            </div>
-            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-              <span class="text-[11px] text-emerald-700 font-semibold block">Zona 2 (Quema de Grasa)</span>
-              <span id="res-fc-zona2" class="text-base font-bold text-emerald-800">134 - 146 ppm</span>
-              <span class="text-[10px] text-emerald-600 block mt-0.5">60% a 70% de reserva</span>
+            <div class="p-3 rounded-2xl border border-emerald-100 bg-emerald-50/40">
+              <span class="text-[11px] font-bold text-emerald-800 block">Carbohidratos</span>
+              <span id="res-macro-carbs" class="text-base font-extrabold text-slate-900 mt-0.5 block">199 g</span>
+              <span id="res-macro-carbs-kcal" class="text-[10px] text-slate-500 block">807 Kcal (42%)</span>
             </div>
           </div>
         </div>
 
-        <!-- Cuadrante 5: Metas de Tiempo e Hidratación -->
-        <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
-          <div>
-            <span class="text-slate-500 block">Hidratación Mínima:</span>
-            <span id="res-agua" class="font-bold text-slate-800 text-sm">2.6 Litros / día</span>
+        <!-- Cuadrante 4: Zonas Cardíacas & Hábitos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-semibold text-slate-500 block">Zona 2 (Quema de Grasa)</span>
+              <span id="res-fc-zona2" class="text-base font-extrabold text-emerald-700 mt-0.5 block">134 - 146 ppm</span>
+              <span class="text-[10px] text-slate-400 block">60% - 70% FCR (Karvonen)</span>
+            </div>
+            <div class="text-right pl-2 border-l border-slate-200">
+              <span class="text-[10px] font-semibold text-slate-400 block">FC Máx</span>
+              <span id="res-fc-max" class="text-sm font-bold text-slate-700">180 ppm</span>
+            </div>
           </div>
-          <div>
-            <span class="text-slate-500 block">Tiempo Estimado:</span>
-            <span id="res-tiempo" class="font-bold text-slate-800 text-sm">~6 semanas</span>
+
+          <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-semibold text-slate-500 block">Hidratación Mínima</span>
+              <span id="res-agua" class="text-base font-extrabold text-blue-700 mt-0.5 block">2.7 L / día</span>
+              <span class="text-[10px] text-slate-400 block">Base 35 ml/kg</span>
+            </div>
+            <div class="text-right pl-2 border-l border-slate-200">
+              <span class="text-[10px] font-semibold text-slate-400 block">Proyección</span>
+              <span id="res-tiempo" class="text-sm font-bold text-slate-700">~4 semanas</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Guía Práctica de Porciones (Solo visible en pantalla) -->
-    <section class="bg-white rounded-2xl p-5 border border-slate-200 card-shadow space-y-4">
-      <h3 class="font-semibold text-slate-800 text-sm">Guía Visual de Porciones Recomendadas</h3>
+    <!-- Guía Visual de Porciones (Solo pantalla) -->
+    <section class="glass-card rounded-2xl p-6 border border-slate-200/80 card-shadow space-y-3">
+      <h3 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+        <span>Equivalencias Visuales para las Comidas</span>
+      </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600">
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-          <span class="font-bold text-slate-700 block">Proteínas Magras</span>
-          <p>Equivalente a la palma de la mano (120–150g) en almuerzo y cena: pollo, pescado, lomo magro, huevos o tofu.</p>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+          <span class="font-bold text-blue-700 block mb-1">Proteínas Magras (Palma)</span>
+          <p>120g a 150g de pechuga, pescado, carne magra o 2 a 3 huevos por comida principal.</p>
         </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-          <span class="font-bold text-slate-700 block">Carbohidratos Complejos</span>
-          <p>Equivalente a un puño cerrado por comida: arroz integral, papa cocida/asada, avena en hojuelas o legumbres.</p>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+          <span class="font-bold text-emerald-700 block mb-1">Carbohidratos (Puño)</span>
+          <p>1 pocillo mediano de arroz cocido, papa o avena. Preferir fuentes integrales y tubérculos.</p>
         </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-          <span class="font-bold text-slate-700 block">Grasas Saludables</span>
-          <p>Equivalente al pulgar: aceite de oliva crudo en ensaladas, un cuarto de aguacate mediano o un puñado pequeño de frutos secos.</p>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60">
+          <span class="font-bold text-amber-700 block mb-1">Grasas Buenas (Pulgar)</span>
+          <p>1 cucharada sopera de aceite de oliva crudo, 1/4 de aguacate mediano o un puñado de frutos secos.</p>
         </div>
       </div>
     </section>
@@ -269,21 +310,21 @@
       let muneca = parseFloat(document.getElementById('muneca').value);
 
       if (unit === 'imperial') {
-        btnI.className = "px-2.5 py-1 rounded-md bg-white text-blue-600 shadow-sm transition";
-        btnM.className = "px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition";
-        lblPeso.innerText = "Peso (libras)";
-        lblEst.innerText = "Estatura (pulgadas)";
-        lblMun.innerText = "Circunferencia de Muñeca (pulgadas)";
+        btnI.className = "px-3 py-1 rounded-lg bg-white text-blue-600 shadow-sm transition";
+        btnM.className = "px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        lblPeso.innerText = "Peso (lb)";
+        lblEst.innerText = "Estatura (in)";
+        lblMun.innerText = "Muñeca (in)";
 
         document.getElementById('peso').value = (peso * 2.20462).toFixed(1);
         document.getElementById('estatura').value = (estatura / 2.54).toFixed(1);
         document.getElementById('muneca').value = (muneca / 2.54).toFixed(1);
       } else {
-        btnM.className = "px-2.5 py-1 rounded-md bg-white text-blue-600 shadow-sm transition";
-        btnI.className = "px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition";
+        btnM.className = "px-3 py-1 rounded-lg bg-white text-blue-600 shadow-sm transition";
+        btnI.className = "px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition";
         lblPeso.innerText = "Peso (kg)";
         lblEst.innerText = "Estatura (cm)";
-        lblMun.innerText = "Circunferencia de Muñeca (cm)";
+        lblMun.innerText = "Muñeca (cm)";
 
         document.getElementById('peso').value = (peso / 2.20462).toFixed(1);
         document.getElementById('estatura').value = (estatura * 2.54).toFixed(1);
@@ -303,12 +344,11 @@
       const fcReposo = parseFloat(document.getElementById('fc_reposo').value) || 65;
       const deficitPct = parseFloat(document.getElementById('deficit_pct').value) || 0.20;
 
-      // Conversión a métrico si está en imperial
       let pesoKg = currentUnits === 'imperial' ? peso / 2.20462 : peso;
       let estaturaCm = currentUnits === 'imperial' ? estatura * 2.54 : estatura;
       let munecaCm = currentUnits === 'imperial' ? muneca * 2.54 : muneca;
 
-      // 1. Contextura Ósea (Índice de Grant: Talla / Muñeca)
+      // 1. Contextura Ósea (Índice de Grant)
       let rGrant = estaturaCm / munecaCm;
       let contextura = "Mediana";
       if (genero === 'hombre') {
@@ -319,23 +359,23 @@
         else if (rGrant < 10.1) contextura = "Grande";
       }
 
-      // 2. IMC y Clasificación OMS
+      // 2. IMC
       let imc = pesoKg / ((estaturaCm / 100) ** 2);
       let imcRango = "Normopeso";
-      let imcColor = "text-emerald-600";
-      if (imc < 18.5) { imcRango = "Bajo Peso"; imcColor = "text-amber-600"; }
-      else if (imc >= 25 && imc < 30) { imcRango = "Sobrepeso"; imcColor = "text-amber-600"; }
-      else if (imc >= 30) { imcRango = "Obesidad"; imcColor = "text-rose-600"; }
+      let imcBadgeClass = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+      if (imc < 18.5) { imcRango = "Bajo Peso"; imcBadgeClass = "bg-amber-50 text-amber-700 border border-amber-200"; }
+      else if (imc >= 25 && imc < 30) { imcRango = "Sobrepeso"; imcBadgeClass = "bg-amber-50 text-amber-700 border border-amber-200"; }
+      else if (imc >= 30) { imcRango = "Obesidad"; imcBadgeClass = "bg-rose-50 text-rose-700 border border-rose-200"; }
 
-      // 3. Porcentaje de Grasa (Deurenberg)
+      // 3. Grasa Corporal (Deurenberg)
       let sexoFactor = genero === 'hombre' ? 1 : 0;
       let gc = (1.20 * imc) + (0.23 * edad) - (10.8 * sexoFactor) - 5.4;
       let gcRango = "Normal";
-      let gcColor = "text-emerald-600";
+      let gcBadgeClass = "bg-emerald-50 text-emerald-700 border border-emerald-200";
       if (genero === 'hombre') {
-        if (gc > 25) { gcRango = "Elevado"; gcColor = "text-rose-600"; }
+        if (gc > 25) { gcRango = "Elevado"; gcBadgeClass = "bg-rose-50 text-rose-700 border border-rose-200"; }
       } else {
-        if (gc > 32) { gcRango = "Elevado"; gcColor = "text-rose-600"; }
+        if (gc > 32) { gcRango = "Elevado"; gcBadgeClass = "bg-rose-50 text-rose-700 border border-rose-200"; }
       }
 
       // 4. Peso Objetivo
@@ -364,9 +404,9 @@
       let z2Min = Math.round((fcReserva * 0.60) + fcReposo);
       let z2Max = Math.round((fcReserva * 0.70) + fcReposo);
 
-      // 8. Hidratación y Tiempo Estimado
+      // 8. Hidratación y Tiempo
       let aguaLitros = ((pesoKg * 35) / 1000).toFixed(1);
-      let tiempoTexto = "Meta actual alcanzada";
+      let tiempoTexto = "Normopeso alcanzado";
       if (difPesoKg < -0.5) {
         let deficitDiarioKcal = get - metaKcal;
         if (deficitDiarioKcal > 0) {
@@ -375,21 +415,21 @@
         }
       }
 
-      // Volcado a la interfaz
+      // Volcado DOM
       document.getElementById('res-nombre').innerText = nombre;
       document.getElementById('res-meta-perfil').innerText = `${genero === 'hombre' ? 'Hombre' : 'Mujer'}, ${edad} años | Complexión ${contextura}`;
       document.getElementById('res-imc').innerText = imc.toFixed(1);
       document.getElementById('res-imc-rango').innerText = imcRango;
-      document.getElementById('res-imc-rango').className = `text-[10px] font-bold ${imcColor} mt-0.5`;
+      document.getElementById('res-imc-rango').className = `inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 ${imcBadgeClass}`;
 
       document.getElementById('res-gc').innerText = `${gc.toFixed(1)}%`;
       document.getElementById('res-gc-rango').innerText = gcRango;
-      document.getElementById('res-gc-rango').className = `text-[10px] font-bold ${gcColor} mt-0.5`;
+      document.getElementById('res-gc-rango').className = `inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 ${gcBadgeClass}`;
 
       let displayPesoMeta = currentUnits === 'imperial' ? (pesoMetaKg * 2.20462).toFixed(1) + " lb" : pesoMetaKg.toFixed(1) + " kg";
       let displayDifPeso = currentUnits === 'imperial' ? (difPesoKg * 2.20462).toFixed(1) + " lb" : difPesoKg.toFixed(1) + " kg";
       document.getElementById('res-peso-meta').innerText = displayPesoMeta;
-      document.getElementById('res-kilos-perder').innerText = `Diferencia: ${displayDifPeso}`;
+      document.getElementById('res-kilos-perder').innerText = `Dif: ${displayDifPeso}`;
 
       document.getElementById('res-tmb').innerText = `${Math.round(tmb)} Kcal`;
       document.getElementById('res-get').innerText = `${Math.round(get)} Kcal`;
@@ -408,7 +448,7 @@
       document.getElementById('res-fc-max').innerText = `${fcMax} ppm`;
       document.getElementById('res-fc-zona2').innerText = `${z2Min} - ${z2Max} ppm`;
 
-      document.getElementById('res-agua').innerText = `${aguaLitros} Litros / día`;
+      document.getElementById('res-agua').innerText = `${aguaLitros} L / día`;
       document.getElementById('res-tiempo').innerText = tiempoTexto;
     }
 
@@ -420,14 +460,14 @@
         useCORS: true
       }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `analisis_biometrico_${new Date().toISOString().slice(0,10)}.png`;
+        link.download = `ficha_biometrica_${new Date().toISOString().slice(0,10)}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
       });
     }
 
     window.onload = function() {
-      const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
+      const opciones = { day: 'numeric', month: 'short', year: 'numeric' };
       document.getElementById('res-fecha').innerText = new Date().toLocaleDateString('es-ES', opciones);
       calcular();
     };
