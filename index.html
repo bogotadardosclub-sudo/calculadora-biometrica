@@ -3,112 +3,440 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Biometría & Salud</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- html2canvas -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- html2canvas con carga diferida para no bloquear datos móviles -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+    :root {
+      --bg-top: #0f172a;
+      --bg-mid: #092347;
+      --bg-bot: #042f2e;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.16);
+      --sky-light: #bae6fd;
+      --sky-accent: #38bdf8;
+      --text-main: #ffffff;
+      --text-muted: #cbd5e1;
+      --card-white: #ffffff;
+      --ink-dark: #0f172a;
+      --ink-gray: #64748b;
     }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 55%, var(--bg-bot) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 16px 12px 32px;
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .btn-unit {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+
+    /* Botón principal desplegable */
+    .btn-toggle-form {
+      width: 100%;
+      padding: 14px 16px;
+      background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-radius: 16px;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .badge-edit {
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    /* Paneles Glassmorphism */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Formulario */
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .form-title {
+      font-weight: 700;
+      color: var(--sky-accent);
+      font-size: 0.9rem;
+    }
+
+    .form-privacy {
+      font-size: 0.65rem;
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    .alert-box {
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      color: #fde68a;
+      font-size: 0.75rem;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .grid-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .col-span-2 {
+      grid-column: span 2;
+    }
+
+    label {
+      display: block;
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
     .input-dark {
       width: 100%;
-      padding: 0.7rem 0.85rem;
+      padding: 11px 12px;
       font-size: 0.9rem;
-      border-radius: 0.75rem;
+      border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.22);
-      background-color: rgba(15, 23, 42, 0.75);
+      background-color: rgba(15, 23, 42, 0.8);
       color: #ffffff;
       outline: none;
-      transition: all 0.2s;
     }
+
     .input-dark::placeholder {
       color: rgba(148, 163, 184, 0.55);
     }
+
     .input-dark:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+      border-color: var(--sky-accent);
     }
-    details summary::-webkit-details-marker { display: none; }
-    details > summary { list-style: none; }
+
+    .btn-calc {
+      width: 100%;
+      margin-top: 14px;
+      padding: 13px;
+      background: linear-gradient(90deg, #0ea5e9 0%, #2563eb 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+
+    /* Tarjeta de Resultados */
+    #card-render {
+      background: linear-gradient(160deg, #0f233d 0%, #091d36 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .report-head {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 10px;
+    }
+
+    .report-tag {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--sky-accent);
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .report-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .report-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .sec-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--sky-light);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .white-box {
+      background: var(--card-white);
+      color: var(--ink-dark);
+      border-radius: 16px;
+      padding: 10px 8px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .box-lbl {
+      font-size: 0.63rem;
+      font-weight: 600;
+      color: var(--ink-gray);
+      display: block;
+    }
+
+    .box-val {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: var(--ink-dark);
+      margin-top: 2px;
+      display: block;
+    }
+
+    .box-sub {
+      font-size: 0.62rem;
+      font-weight: 700;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .macro-food {
+      font-size: 0.56rem;
+      color: var(--ink-gray);
+      border-top: 1px solid #f1f5f9;
+      padding-top: 4px;
+      margin-top: 5px;
+      line-height: 1.2;
+    }
+
+    .pill-full {
+      background: var(--card-white);
+      color: var(--ink-dark);
+      border-radius: 14px;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .habit-row {
+      background: var(--card-white);
+      color: #334155;
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 0.73rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    /* Colores semáforo */
+    .c-green { color: #059669; }
+    .c-amber { color: #d97706; }
+    .c-rose { color: #e11d48; }
+    .c-blue { color: #2563eb; }
+    .c-muted { color: #94a3b8; }
+
+    /* Botón Descargar */
+    .btn-download {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, #10b981 0%, #14b8a6 100%);
+      color: #022c22;
+      font-weight: 800;
+      font-size: 0.88rem;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+    }
+
+    /* Acordeón FAQ */
+    .faq-item {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .faq-item summary {
+      padding: 12px 14px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-body {
+      padding: 10px 14px 14px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      line-height: 1.45;
+    }
+
+    .faq-body p + p {
+      margin-top: 6px;
+    }
   </style>
 </head>
-<body class="bg-gradient-to-b from-[#0f172a] via-[#092347] to-[#042f2e] text-white antialiased min-h-screen py-4 px-3 sm:px-4">
+<body>
 
-  <div class="max-w-md mx-auto space-y-4">
-
+  <div class="container">
     <!-- BARRA SUPERIOR -->
-    <header class="flex justify-between items-center px-1 pt-1">
-      <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center space-x-1.5">
-        <span>Biometría & Salud</span>
-      </h1>
-      <!-- Selector Métrico / Imperial -->
-      <button id="btn-toggle-unit" onclick="toggleUnits()" class="px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 hover:bg-white/20 border border-white/20 text-slate-200 transition">
-        Métrico (kg/cm)
-      </button>
+    <header>
+      <h1>Biometría & Salud</h1>
+      <button id="btn-toggle-unit" onclick="toggleUnits()" class="btn-unit">Métrico (kg/cm)</button>
     </header>
 
     <!-- BOTÓN SUPERIOR DE ACCIÓN -->
-    <button onclick="toggleFormulario()" id="btn-toggle-form" class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl text-sm shadow-lg shadow-blue-600/30 transition flex items-center justify-between border border-blue-400/30">
-      <div class="flex items-center space-x-2.5">
-        <svg class="w-5 h-5 text-sky-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-        <span id="btn-toggle-form-text">Diligenciar / Modificar Datos</span>
-      </div>
-      <span id="btn-toggle-form-icon" class="text-xs bg-white/20 px-2.5 py-1 rounded-lg">Cerrar ▲</span>
+    <button onclick="toggleFormulario()" class="btn-toggle-form">
+      <span>✏️ Diligenciar / Modificar Datos</span>
+      <span id="btn-toggle-form-icon" class="badge-edit">Cerrar ▲</span>
     </button>
 
     <!-- FORMULARIO DE ENTRADA -->
-    <section id="form-section" class="glass-panel rounded-3xl p-5 text-xs space-y-3.5 border border-white/20 shadow-xl">
-      <div class="flex justify-between items-center border-b border-white/10 pb-2">
-        <span class="font-bold text-sky-300 text-sm">Ingreso de Parámetros</span>
-        <span class="text-[10px] text-emerald-400 font-semibold">100% privado en tu celular</span>
+    <section id="form-section" class="glass-panel">
+      <div class="form-header">
+        <span class="form-title">Ingreso de Parámetros</span>
+        <span class="form-privacy">100% privado en tu celular</span>
       </div>
 
-      <!-- Alerta dinámica si faltan datos -->
-      <div id="msg-alerta" class="hidden p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-200 text-xs text-center font-medium"></div>
-      
-      <div class="grid grid-cols-2 gap-3 pt-1">
+      <div id="msg-alerta" class="alert-box hidden"></div>
+
+      <div class="grid-form">
         <div class="col-span-2">
-          <label class="block text-slate-300 mb-1 font-medium">Nombre o Identificador</label>
+          <label>Nombre o Identificador</label>
           <input type="text" id="nombre" placeholder="Escribe tu nombre..." oninput="calcular(false)" class="input-dark">
         </div>
         <div>
-          <label class="block text-slate-300 mb-1 font-medium">Género Biológico</label>
+          <label>Género Biológico</label>
           <select id="genero" onchange="calcular(false)" class="input-dark">
             <option value="hombre" selected>Hombre</option>
             <option value="mujer">Mujer</option>
           </select>
         </div>
         <div>
-          <label class="block text-slate-300 mb-1 font-medium">Edad (años) *</label>
+          <label>Edad (años) *</label>
           <input type="text" inputmode="numeric" id="edad" placeholder="Ej. 38" oninput="calcular(false)" class="input-dark">
         </div>
         <div>
-          <label id="lbl-peso" class="block text-slate-300 mb-1 font-medium">Peso (kg) *</label>
+          <label id="lbl-peso">Peso (kg) *</label>
           <input type="text" inputmode="decimal" id="peso" placeholder="Ej. 76.5" oninput="calcular(false)" class="input-dark">
         </div>
         <div>
-          <label id="lbl-estatura" class="block text-slate-300 mb-1 font-medium">Estatura (cm) *</label>
+          <label id="lbl-estatura">Estatura (cm) *</label>
           <input type="text" inputmode="decimal" id="estatura" placeholder="Ej. 175" oninput="calcular(false)" class="input-dark">
         </div>
         <div>
-          <label id="lbl-muneca" class="block text-slate-300 mb-1 font-medium">Muñeca (cm) (opcional)</label>
+          <label id="lbl-muneca">Muñeca (cm) (opc.)</label>
           <input type="text" inputmode="decimal" id="muneca" placeholder="Ej. 17.0" oninput="calcular(false)" class="input-dark">
         </div>
         <div>
-          <label class="block text-slate-300 mb-1 font-medium">FC Reposo (ppm)</label>
+          <label>FC Reposo (ppm)</label>
           <input type="text" inputmode="numeric" id="fc_reposo" placeholder="Ej. 65" oninput="calcular(false)" class="input-dark">
         </div>
         <div class="col-span-2">
-          <label class="block text-slate-300 mb-1 font-medium">Nivel de Actividad Física</label>
+          <label>Nivel de Actividad Física</label>
           <select id="actividad" onchange="calcular(false)" class="input-dark">
             <option value="1.2">Sedentario (poco o nada de ejercicio)</option>
             <option value="1.375" selected>Levemente activo (ejercicio 1 a 3 días/sem)</option>
@@ -118,8 +446,8 @@
           </select>
         </div>
         <div class="col-span-2">
-          <label class="block text-slate-300 mb-1 font-medium">Estrategia Nutricional Deseada</label>
-          <select id="deficit_pct" onchange="calcular(false)" class="input-dark font-medium">
+          <label>Estrategia Nutricional Deseada</label>
+          <select id="deficit_pct" onchange="calcular(false)" class="input-dark">
             <option value="0">Mantenimiento de Peso (0% déficit)</option>
             <option value="0.10">Pérdida Gradual / Recomposición (-10% déficit)</option>
             <option value="0.20" selected>Pérdida Moderada Estándar (-20% déficit)</option>
@@ -128,201 +456,149 @@
         </div>
       </div>
 
-      <!-- BOTÓN PRINCIPAL PARA CALCULAR -->
-      <button onclick="ejecutarCalculoYVer()" class="w-full mt-3 py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center space-x-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-        <span>⚡ Calcular y Ver Resultados</span>
-      </button>
+      <button onclick="ejecutarCalculoYVer()" class="btn-calc">⚡ Calcular y Ver Resultados</button>
     </section>
 
     <!-- TARJETA VISUAL (EXPORTABLE COMO IMAGEN PNG) -->
-    <div id="card-render" class="glass-panel rounded-3xl p-5 shadow-2xl space-y-4 relative overflow-hidden text-slate-900">
-      
-      <!-- ENCABEZADO REPORTE -->
-      <div class="border-b border-white/10 pb-3">
-        <span class="text-[9px] font-extrabold tracking-wider text-sky-300 uppercase block">INFORME ANTROPOMÉTRICO & ENERGÉTICO</span>
-        <h2 id="res-nombre" class="text-xl font-black text-white mt-0.5">Esperando datos</h2>
-        <p id="res-meta-perfil" class="text-[11px] font-medium text-slate-300 mt-0.5">Ingresa edad, peso y estatura arriba</p>
+    <div id="card-render" class="glass-panel">
+      <div class="report-head">
+        <span class="report-tag">INFORME ANTROPOMÉTRICO & ENERGÉTICO</span>
+        <h2 id="res-nombre" class="report-name">Esperando datos</h2>
+        <p id="res-meta-perfil" class="report-sub">Ingresa edad, peso y estatura arriba</p>
       </div>
 
-      <!-- SECCIÓN 1: COMPOSICIÓN CORPORAL -->
-      <div class="space-y-1.5">
-        <h3 class="text-[11px] font-bold text-sky-200 uppercase tracking-wide">Composición Corporal</h3>
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm">
-            <span class="text-[10px] font-semibold text-slate-500 block">IMC Actual:</span>
-            <span id="res-imc" class="text-base font-extrabold text-slate-900 block leading-tight">--</span>
-            <span id="res-imc-rango" class="text-[10px] font-bold text-slate-400 block">(Esperando)</span>
+      <div>
+        <div class="sec-title">Composición Corporal</div>
+        <div class="grid-3">
+          <div class="white-box">
+            <span class="box-lbl">IMC Actual:</span>
+            <span id="res-imc" class="box-val">--</span>
+            <span id="res-imc-rango" class="box-sub c-muted">(Esperando)</span>
           </div>
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm">
-            <span class="text-[10px] font-semibold text-slate-500 block">% Grasa Est.:</span>
-            <span id="res-gc" class="text-base font-extrabold text-slate-900 block leading-tight">--</span>
-            <span id="res-gc-rango" class="text-[10px] font-bold text-slate-400 block">(Esperando)</span>
+          <div class="white-box">
+            <span class="box-lbl">% Grasa Est.:</span>
+            <span id="res-gc" class="box-val">--</span>
+            <span id="res-gc-rango" class="box-sub c-muted">(Esperando)</span>
           </div>
-          <!-- RECUADRO ADAPTATIVO: RECOMPOSICIÓN O PESO META -->
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm">
-            <span id="res-meta-titulo" class="text-[10px] font-semibold text-slate-500 block">Peso Meta OMS:</span>
-            <span id="res-peso-meta" class="text-base font-extrabold text-slate-900 block leading-tight">--</span>
-            <span id="res-kilos-perder" class="text-[9.5px] font-medium text-slate-500 block leading-tight mt-0.5">(Dif: --)</span>
+          <div class="white-box">
+            <span id="res-meta-titulo" class="box-lbl">Peso Meta OMS:</span>
+            <span id="res-peso-meta" class="box-val">--</span>
+            <span id="res-kilos-perder" class="box-sub c-muted">(Dif: --)</span>
           </div>
         </div>
       </div>
 
-      <!-- SECCIÓN 2: PLANIFICACIÓN ENERGÉTICA -->
-      <div class="space-y-1.5">
-        <h3 class="text-[11px] font-bold text-sky-200 uppercase tracking-wide">Planificación Energética</h3>
-        <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm">
-            <span class="text-[10px] font-semibold text-slate-500 block">Gasto Basal (TMB):</span>
-            <span id="res-tmb" class="text-base font-extrabold text-slate-900 block mt-0.5">-- Kcal</span>
+      <div>
+        <div class="sec-title">Planificación Energética</div>
+        <div class="grid-2">
+          <div class="white-box">
+            <span class="box-lbl">Gasto Basal (TMB):</span>
+            <span id="res-tmb" class="box-val">-- Kcal</span>
           </div>
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm">
-            <span class="text-[10px] font-semibold text-slate-500 block">Gasto Total (GET):</span>
-            <span id="res-get" class="text-base font-extrabold text-slate-900 block mt-0.5">-- Kcal</span>
+          <div class="white-box">
+            <span class="box-lbl">Gasto Total (GET):</span>
+            <span id="res-get" class="box-val">-- Kcal</span>
           </div>
         </div>
-        <!-- Meta Nutricional Diaria -->
-        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm">
-          <span class="text-xs font-bold text-blue-900">
-            Meta Nutricional: <span id="res-meta-kcal" class="text-sm font-extrabold text-blue-700">-- Kcal</span> 
-            <span id="res-deficit-info" class="text-[11px] font-medium text-slate-500">(Esperando datos)</span>
-          </span>
+        <div class="pill-full">
+          <span style="color:#1e3a8a;">Meta Nutricional: </span>
+          <span id="res-meta-kcal" style="color:#1d4ed8; font-weight:800;">-- Kcal</span>
+          <span id="res-deficit-info" style="color:#64748b; font-weight:500; font-size:0.7rem;">(Esperando datos)</span>
         </div>
       </div>
 
-      <!-- SECCIÓN 3: MACRONUTRIENTES CON MICRO-ETIQUETAS LIMPIAS (OPCIÓN 2C) -->
-      <div class="space-y-1.5">
-        <h3 class="text-[11px] font-bold text-sky-200 uppercase tracking-wide">Macronutrientes Sugeridos</h3>
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-semibold text-slate-500 block">Proteína (1.8g/kg):</span>
-              <span id="res-macro-prot" class="text-sm font-extrabold text-slate-900 block mt-0.5">-- g</span>
-            </div>
-            <span class="text-[8.5px] text-slate-400 font-medium border-t border-slate-100 pt-1 mt-1 block leading-tight">Pollo, pescado, huevo, yogur</span>
+      <div>
+        <div class="sec-title">Macronutrientes Sugeridos</div>
+        <div class="grid-3">
+          <div class="white-box">
+            <span class="box-lbl">Proteína (1.8g/kg):</span>
+            <span id="res-macro-prot" class="box-val">-- g</span>
+            <span class="macro-food">Pollo, pescado, huevo, yogur</span>
           </div>
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-semibold text-slate-500 block">Grasas Buenas:</span>
-              <span id="res-macro-grasas" class="text-sm font-extrabold text-slate-900 block mt-0.5">-- g</span>
-            </div>
-            <span class="text-[8.5px] text-slate-400 font-medium border-t border-slate-100 pt-1 mt-1 block leading-tight">Oliva, aguacate, frutos secos</span>
+          <div class="white-box">
+            <span class="box-lbl">Grasas Buenas:</span>
+            <span id="res-macro-grasas" class="box-val">-- g</span>
+            <span class="macro-food">Oliva, aguacate, frutos secos</span>
           </div>
-          <div class="bg-white rounded-2xl p-2.5 shadow-sm flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-semibold text-slate-500 block">Carbohidratos:</span>
-              <span id="res-macro-carbs" class="text-sm font-extrabold text-slate-900 block mt-0.5">-- g</span>
-            </div>
-            <span class="text-[8.5px] text-slate-400 font-medium border-t border-slate-100 pt-1 mt-1 block leading-tight">Avena, papa, arroz, fruta</span>
+          <div class="white-box">
+            <span class="box-lbl">Carbohidratos:</span>
+            <span id="res-macro-carbs" class="box-val">-- g</span>
+            <span class="macro-food">Avena, papa, arroz, fruta</span>
           </div>
         </div>
       </div>
 
-      <!-- SECCIÓN 4: ZONAS CARDÍACAS & HÁBITOS -->
-      <div class="space-y-1.5">
-        <h3 class="text-[11px] font-bold text-sky-200 uppercase tracking-wide">Zonas Cardíacas & Hábitos</h3>
-        <div class="bg-white rounded-2xl p-2.5 text-center shadow-sm">
-          <span class="text-[10px] font-semibold text-slate-500 block">Zona 2 (Quema Grasa / Resistencia):</span>
-          <span id="res-fc-zona2" class="text-base font-extrabold text-slate-900 block mt-0.5">-- ppm</span>
+      <div>
+        <div class="sec-title">Zonas Cardíacas & Hábitos</div>
+        <div class="white-box">
+          <span class="box-lbl">Zona 2 (Quema Grasa / Resistencia):</span>
+          <span id="res-fc-zona2" class="box-val">-- ppm</span>
         </div>
-        <div class="bg-white rounded-2xl p-2.5 flex justify-around items-center text-xs text-slate-700 shadow-sm">
-          <div>Hidratación: <span id="res-agua" class="font-extrabold text-slate-900">-- L / día</span></div>
-          <div class="text-slate-300">|</div>
-          <div><span id="res-tiempo" class="font-bold text-slate-800">Objetivo: --</span></div>
+        <div class="habit-row">
+          <div>Hidratación: <strong id="res-agua" style="color:#0f172a;">-- L / día</strong></div>
+          <span style="color:#cbd5e1;">|</span>
+          <div id="res-tiempo" style="font-weight:700; color:#1e293b;">Objetivo: --</div>
         </div>
       </div>
-
     </div>
 
-    <!-- BOTÓN DE DESCARGA DE IMAGEN -->
-    <button onclick="descargarImagen()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-bold rounded-2xl text-sm shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-2">
-      <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-      <span>Descargar Imagen Resumen (PNG)</span>
-    </button>
+    <!-- BOTÓN DESCARGA -->
+    <button onclick="descargarImagen()" class="btn-download">📥 Descargar Imagen Resumen (PNG)</button>
 
-    <!-- GUÍA Y PREGUNTAS FRECUENTES EN ACORDEÓN TÁCTIL (OPCIÓN 3A) -->
-    <section class="glass-panel rounded-3xl p-5 border border-white/15 space-y-3">
-      <div class="border-b border-white/10 pb-2">
-        <h3 class="font-bold text-sky-300 text-sm flex items-center space-x-1.5">
-          <span>💡 Guía Didáctica: ¿Cómo Interpretar Tu Ficha?</span>
-        </h3>
-        <p class="text-[10px] text-slate-300">Toca cada pregunta para desplegar tu explicación personalizada:</p>
+    <!-- GUÍA DIDÁCTICA EN ACORDEÓN -->
+    <section class="glass-panel">
+      <div class="form-header" style="margin-bottom:6px;">
+        <span class="form-title">💡 Guía: ¿Cómo Interpretar Tu Ficha?</span>
       </div>
+      <p style="font-size:0.68rem; color:#cbd5e1; margin-bottom:8px;">Toca cada pregunta para ver tu explicación:</p>
 
-      <!-- FAQ 1: Peso normal vs grasa alta -->
-      <details class="group bg-slate-900/60 rounded-2xl border border-white/10 overflow-hidden transition">
-        <summary class="p-3.5 text-xs font-bold text-white flex justify-between items-center cursor-pointer select-none">
-          <span class="flex items-center space-x-2 text-left">
-            <span class="text-sky-400">❓</span>
-            <span id="faq-t1">¿Por qué mi peso es normal pero mi grasa es alta?</span>
-          </span>
-          <span class="text-sky-300 transition-transform duration-200 group-open:rotate-180 ml-2">▼</span>
+      <details class="faq-item">
+        <summary>
+          <span>❓ ¿Por qué mi peso es normal pero mi grasa es alta?</span>
+          <span style="color:#38bdf8;">▼</span>
         </summary>
-        <div id="faq-r1" class="px-3.5 pb-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-white/5 pt-2.5 space-y-1.5">
+        <div class="faq-body">
           <p>El peso en la báscula suma huesos, agua, órganos y músculo, sin discriminar grasa.</p>
-          <p>A partir de los 40-50 años es natural perder masa muscular (<strong class="text-slate-100">sarcopenia</strong>) si no se hace trabajo de fuerza, lo que aumenta la proporción de grasa relativa aunque el peso se mantenga estable.</p>
-          <p class="text-emerald-300 font-semibold">En este caso la meta no es perder kilos, sino hacer «Recomposición Corporal»: ganar masa muscular con fuerza y proteína para desplazar la grasa.</p>
+          <p>Con los años o falta de ejercicio de fuerza se pierde masa muscular (<strong style="color:#fff;">sarcopenia</strong>), elevando la proporción de grasa relativa aunque el peso sea normal.</p>
+          <p style="color:#6ee7b7; font-weight:600;">En este caso la meta no es bajar kilos, sino hacer «Recomposición Corporal»: ganar músculo para desplazar la grasa.</p>
         </div>
       </details>
 
-      <!-- FAQ 2: TMB vs GET vs Consumo -->
-      <details class="group bg-slate-900/60 rounded-2xl border border-white/10 overflow-hidden transition">
-        <summary class="p-3.5 text-xs font-bold text-white flex justify-between items-center cursor-pointer select-none">
-          <span class="flex items-center space-x-2 text-left">
-            <span class="text-sky-400">❓</span>
-            <span>¿Qué significan TMB, GET y Consumo Sugerido?</span>
-          </span>
-          <span class="text-sky-300 transition-transform duration-200 group-open:rotate-180 ml-2">▼</span>
+      <details class="faq-item">
+        <summary>
+          <span>❓ ¿Qué significan TMB, GET y Consumo Sugerido?</span>
+          <span style="color:#38bdf8;">▼</span>
         </summary>
-        <div id="faq-r2" class="px-3.5 pb-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-white/5 pt-2.5 space-y-1.5">
-          <p>• <strong class="text-white">TMB (Metabolismo Basal):</strong> Las calorías mínimas que tu organismo quema en reposo absoluto solo por mantenerse vivo (respiración, corazón, función cerebral).</p>
-          <p>• <strong class="text-white">GET (Gasto Total con Ejercicio):</strong> Las calorías reales que gastas en el día sumando tu nivel de actividad física. Si consumes exactamente este valor, mantendrás tu peso actual.</p>
-          <p>• <strong class="text-emerald-300">Consumo Diario Sugerido:</strong> Tu presupuesto calórico diario con el déficit programado para obligar al cuerpo a oxidar grasa acumulada de manera segura.</p>
+        <div id="faq-r2" class="faq-body">
+          <p>• <strong style="color:#fff;">TMB (Metabolismo Basal):</strong> Calorías mínimas que quema tu organismo en reposo absoluto.</p>
+          <p>• <strong style="color:#fff;">GET (Gasto Total):</strong> Calorías diarias reales sumando tu actividad física.</p>
+          <p>• <strong style="color:#6ee7b7;">Consumo Sugerido:</strong> Presupuesto calórico diario con el déficit seleccionado para oxidar grasa.</p>
         </div>
       </details>
 
-      <!-- FAQ 3: Zona 2 -->
-      <details class="group bg-slate-900/60 rounded-2xl border border-white/10 overflow-hidden transition">
-        <summary class="p-3.5 text-xs font-bold text-white flex justify-between items-center cursor-pointer select-none">
-          <span class="flex items-center space-x-2 text-left">
-            <span class="text-sky-400">❓</span>
-            <span id="faq-t3">¿Cómo entrenar en Zona 2 de frecuencia cardíaca?</span>
-          </span>
-          <span class="text-sky-300 transition-transform duration-200 group-open:rotate-180 ml-2">▼</span>
+      <details class="faq-item">
+        <summary>
+          <span id="faq-t3">❓ ¿Cómo entrenar en Zona 2 de frecuencia cardíaca?</span>
+          <span style="color:#38bdf8;">▼</span>
         </summary>
-        <div id="faq-r3" class="px-3.5 pb-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-white/5 pt-2.5 space-y-1.5">
-          <p>Es una intensidad aeróbica moderada evaluada por la <strong class="text-slate-100">«prueba del habla»</strong>: debes ser capaz de mantener una conversación fluida en oraciones completas sin ahogarte, pero sin poder cantar.</p>
-          <p>En este rango de pulsaciones por minuto, tus mitocondrias utilizan prioritariamente <strong class="text-sky-300 font-semibold">ácidos grasos como fuente de combustible</strong> en lugar de glucosa en sangre.</p>
-          <p class="text-emerald-300 font-semibold">Recomendación: 35 a 50 minutos continuos (caminata rápida en cuesta, bicicleta o elíptica) 3 a 4 veces por semana.</p>
+        <div class="faq-body">
+          <p>Es una intensidad aeróbica moderada evaluada por la <strong style="color:#fff;">«prueba del habla»</strong>: puedes mantener una conversación fluida sin ahogarte, pero no cantar.</p>
+          <p>A este ritmo, tus mitocondrias usan principalmente <strong style="color:#38bdf8;">ácidos grasos como energía</strong>. Ideal: 35 a 50 minutos continuos, 3 a 4 veces por semana.</p>
         </div>
       </details>
 
-      <!-- FAQ 4: Distribución de macronutrientes en el plato -->
-      <details class="group bg-slate-900/60 rounded-2xl border border-white/10 overflow-hidden transition">
-        <summary class="p-3.5 text-xs font-bold text-white flex justify-between items-center cursor-pointer select-none">
-          <span class="flex items-center space-x-2 text-left">
-            <span class="text-sky-400">❓</span>
-            <span id="faq-t4">¿Cómo repartir mis macronutrientes en las comidas?</span>
-          </span>
-          <span class="text-sky-300 transition-transform duration-200 group-open:rotate-180 ml-2">▼</span>
+      <details class="faq-item">
+        <summary>
+          <span id="faq-t4">❓ ¿Cómo repartir mis macronutrientes en las comidas?</span>
+          <span style="color:#38bdf8;">▼</span>
         </summary>
-        <div id="faq-r4" class="px-3.5 pb-3.5 text-[11px] text-slate-300 leading-relaxed border-t border-white/5 pt-2.5 space-y-2">
-          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-white/5">
-            <span class="font-bold text-blue-300 block mb-0.5">🍗 Proteínas Magras (1.8 g/kg)</span>
-            <p>1 palma de mano en almuerzo y cena (pechuga, pescado blanco, lomo magro, tofu) + 2 huevos al desayuno + yogur griego en colación. Protege tu masa muscular durante el déficit.</p>
-          </div>
-          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-white/5">
-            <span class="font-bold text-amber-300 block mb-0.5">🥑 Grasas Saludables</span>
-            <p>1 cucharada sopera de aceite de oliva crudo en ensaladas, 1/4 a 1/3 de aguacate mediano o 1 puñado pequeño de almendras/nueces. Indispensables para balance hormonal.</p>
-          </div>
-          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-white/5">
-            <span class="font-bold text-emerald-300 block mb-0.5">🥔 Carbohidratos Complejos</span>
-            <p>1 puño cerrado por comida de papa, arroz integral, avena o legumbres + frutas enteras. Aportan fibra y glucógeno sin disparar la insulina.</p>
-          </div>
+        <div class="faq-body">
+          <p><strong style="color:#93c5fd;">🍗 Proteínas (1.8 g/kg):</strong> 1 palma de mano en almuerzo y cena (pollo, pescado, carne magra, tofu) + 2 huevos al desayuno + yogur griego.</p>
+          <p><strong style="color:#fcd34d;">🥑 Grasas Buenas:</strong> 1 cucharada de aceite de oliva crudo, 1/3 de aguacate o un puñado pequeño de frutos secos.</p>
+          <p><strong style="color:#6ee7b7;">🥔 Carbohidratos:</strong> 1 puño cerrado por comida de papa, arroz integral, avena o legumbres + frutas enteras.</p>
         </div>
       </details>
     </section>
-
   </div>
 
   <script>
@@ -357,7 +633,7 @@
         btn.innerText = "Imperial (lb/in)";
         document.getElementById('lbl-peso').innerText = "Peso (lb) *";
         document.getElementById('lbl-estatura').innerText = "Estatura (in) *";
-        document.getElementById('lbl-muneca').innerText = "Muñeca (in) (opcional)";
+        document.getElementById('lbl-muneca').innerText = "Muñeca (in) (opc.)";
         if (peso !== null) document.getElementById('peso').value = (peso * 2.20462).toFixed(1);
         if (estatura !== null) document.getElementById('estatura').value = (estatura / 2.54).toFixed(1);
         if (muneca !== null) document.getElementById('muneca').value = (muneca / 2.54).toFixed(1);
@@ -366,7 +642,7 @@
         btn.innerText = "Métrico (kg/cm)";
         document.getElementById('lbl-peso').innerText = "Peso (kg) *";
         document.getElementById('lbl-estatura').innerText = "Estatura (cm) *";
-        document.getElementById('lbl-muneca').innerText = "Muñeca (cm) (opcional)";
+        document.getElementById('lbl-muneca').innerText = "Muñeca (cm) (opc.)";
         if (peso !== null) document.getElementById('peso').value = (peso / 2.20462).toFixed(1);
         if (estatura !== null) document.getElementById('estatura').value = (estatura * 2.54).toFixed(1);
         if (muneca !== null) document.getElementById('muneca').value = (muneca * 2.54).toFixed(1);
@@ -375,8 +651,7 @@
     }
 
     function ejecutarCalculoYVer() {
-      const exito = calcular(true);
-      if (exito) {
+      if (calcular(true)) {
         document.getElementById('form-section').classList.add('hidden');
         document.getElementById('btn-toggle-form-icon').innerText = "Editar ▼";
         document.getElementById('card-render').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -397,10 +672,9 @@
       const factorActividad = parseFloat(document.getElementById('actividad').value) || 1.375;
       const deficitPct = parseFloat(document.getElementById('deficit_pct').value) || 0.20;
 
-      // Validación de campos obligatorios
       if (!peso || !estatura || !edad || peso <= 0 || estatura <= 0 || edad <= 0) {
         if (mostrarAlertaSiFalta) {
-          alerta.innerText = "⚠️ Por favor ingresa al menos Edad, Peso y Estatura para calcular.";
+          alerta.innerText = "⚠️ Ingresa al menos Edad, Peso y Estatura para calcular.";
           alerta.classList.remove('hidden');
         }
         return false;
@@ -410,7 +684,7 @@
       let estaturaCm = currentUnits === 'imperial' ? estatura * 2.54 : estatura;
       let munecaCm = currentUnits === 'imperial' ? (muneca ? muneca * 2.54 : 17.5) : (muneca || 17.5);
 
-      // 1. Complexión Ósea (Grant)
+      // Complexión (Grant)
       let rGrant = estaturaCm / munecaCm;
       let contextura = "Mediana";
       if (genero === 'hombre') {
@@ -421,35 +695,34 @@
         else if (rGrant < 10.1) contextura = "Grande";
       }
 
-      // 2. IMC y Diagnóstico OMS
+      // IMC OMS
       let imc = pesoKg / ((estaturaCm / 100) ** 2);
       let imcRango = "(Normopeso)";
-      let imcColor = "text-emerald-600";
+      let imcColor = "c-green";
       let enNormopeso = true;
-      if (imc < 18.5) { imcRango = "(Bajo Peso)"; imcColor = "text-amber-600"; enNormopeso = false; }
-      else if (imc >= 25 && imc < 30) { imcRango = "(Sobrepeso)"; imcColor = "text-amber-600"; enNormopeso = false; }
-      else if (imc >= 30) { imcRango = "(Obesidad)"; imcColor = "text-rose-600"; enNormopeso = false; }
+      if (imc < 18.5) { imcRango = "(Bajo Peso)"; imcColor = "c-amber"; enNormopeso = false; }
+      else if (imc >= 25 && imc < 30) { imcRango = "(Sobrepeso)"; imcColor = "c-amber"; enNormopeso = false; }
+      else if (imc >= 30) { imcRango = "(Obesidad)"; imcColor = "c-rose"; enNormopeso = false; }
 
-      // 3. % Grasa (Deurenberg)
+      // % Grasa (Deurenberg)
       let sexoFactor = genero === 'hombre' ? 1 : 0;
       let gc = (1.20 * imc) + (0.23 * edad) - (10.8 * sexoFactor) - 5.4;
       let gcRango = "(Normal)";
-      let gcColor = "text-emerald-600";
+      let gcColor = "c-green";
       let grasaAlta = false;
       if (genero === 'hombre') {
-        if (gc > 25) { gcRango = "(Adiposidad Alta)"; gcColor = "text-amber-600"; grasaAlta = true; }
+        if (gc > 25) { gcRango = "(Adiposidad Alta)"; gcColor = "c-amber"; grasaAlta = true; }
       } else {
-        if (gc > 32) { gcRango = "(Adiposidad Alta)"; gcColor = "text-amber-600"; grasaAlta = true; }
+        if (gc > 32) { gcRango = "(Adiposidad Alta)"; gcColor = "c-amber"; grasaAlta = true; }
       }
 
-      // 4. LÓGICA CORREGIDA DE PESO META (OPCIÓN 1A: RECOMPOSICIÓN INTELIGENTE)
+      // Lógica adaptativa de objetivo (Opción 1A)
       let metaTitulo = "Peso Meta OMS:";
       let metaValorTexto = "";
       let metaDifTexto = "";
       let tiempoTexto = "";
 
       if (enNormopeso && grasaAlta) {
-        // Caso Sandra: Peso normal pero grasa elevada -> Recomposición corporal
         metaTitulo = "Enfoque Sugerido:";
         metaValorTexto = "Recomposición";
         metaDifTexto = `Mantener ${pesoKg.toFixed(1)} kg`;
@@ -460,7 +733,6 @@
         metaDifTexto = "Balance Óptimo";
         tiempoTexto = "Mantenimiento activo";
       } else {
-        // Caso de sobrepeso u obesidad: meta de reducción real hacia normopeso
         let imcTarget = contextura === "Grande" ? 24.8 : (contextura === "Pequeña" ? 22.0 : 23.5);
         let pesoMetaKg = imcTarget * ((estaturaCm / 100) ** 2);
         let difKg = pesoMetaKg - pesoKg;
@@ -474,53 +746,53 @@
         let deficitDiario = getCalc * deficitPct;
         if (deficitDiario > 0 && difKg < 0) {
           let semanas = Math.round((Math.abs(difKg) * 7700) / (deficitDiario * 7));
-          tiempoTexto = `~${semanas} semanas de proyección`;
+          tiempoTexto = `~${semanas} semanas`;
         } else {
           tiempoTexto = "Proyección en curso";
         }
       }
 
-      // 5. Gasto Energético (Mifflin-St Jeor) y Total
+      // Gasto Energético (Mifflin-St Jeor)
       let tmb = (10 * pesoKg) + (6.25 * estaturaCm) - (5 * edad) + (genero === 'hombre' ? 5 : -161);
       let get = tmb * factorActividad;
       let metaKcal = get * (1 - deficitPct);
 
-      // 6. Macronutrientes
+      // Macros
       let protGramos = pesoKg * 1.8;
       let grasaKcal = metaKcal * 0.28;
       let grasaGramos = grasaKcal / 9;
       let carbKcal = Math.max(0, metaKcal - (protGramos * 4) - grasaKcal);
       let carbGramos = carbKcal / 4;
 
-      // 7. Cardio (Tanaka & Karvonen)
+      // Cardio (Tanaka & Karvonen)
       let fcMax = Math.round(208 - (0.7 * edad));
       let fcReserva = fcMax - fcReposo;
       let z2Min = Math.round((fcReserva * 0.60) + fcReposo);
       let z2Max = Math.round((fcReserva * 0.70) + fcReposo);
 
-      // 8. Hidratación
+      // Hidratación
       let aguaLitros = ((pesoKg * 35) / 1000).toFixed(1);
 
-      // VOLCADO A LA TARJETA RESULTADOS
+      // Volcado DOM
       document.getElementById('res-nombre').innerText = nombre || "Evaluación Personal";
       document.getElementById('res-meta-perfil').innerText = `${genero === 'hombre' ? 'Hombre' : 'Mujer'}, ${Math.round(edad)} años | Complexión ${contextura}`;
       document.getElementById('res-imc').innerText = imc.toFixed(1);
       document.getElementById('res-imc-rango').innerText = imcRango;
-      document.getElementById('res-imc-rango').className = `text-[10px] font-bold ${imcColor} block`;
+      document.getElementById('res-imc-rango').className = `box-sub ${imcColor}`;
 
       document.getElementById('res-gc').innerText = `${gc.toFixed(1)}%`;
       document.getElementById('res-gc-rango').innerText = gcRango;
-      document.getElementById('res-gc-rango').className = `text-[10px] font-bold ${gcColor} block`;
+      document.getElementById('res-gc-rango').className = `box-sub ${gcColor}`;
 
       document.getElementById('res-meta-titulo').innerText = metaTitulo;
       document.getElementById('res-peso-meta').innerText = metaValorTexto;
-      document.getElementById('res-peso-meta').className = (enNormopeso && grasaAlta) ? "text-sm font-extrabold text-blue-600 block leading-tight mt-0.5" : "text-base font-extrabold text-slate-900 block leading-tight";
+      document.getElementById('res-peso-meta').className = (enNormopeso && grasaAlta) ? "box-val c-blue" : "box-val";
       document.getElementById('res-kilos-perder').innerText = metaDifTexto;
 
       document.getElementById('res-tmb').innerText = `${Math.round(tmb).toLocaleString()} Kcal`;
       document.getElementById('res-get').innerText = `${Math.round(get).toLocaleString()} Kcal`;
       document.getElementById('res-meta-kcal').innerText = `${Math.round(metaKcal).toLocaleString()} Kcal`;
-      document.getElementById('res-deficit-info').innerText = deficitPct > 0 ? `(-${Math.round(deficitPct * 100)}% déficit para oxidar grasa)` : "(Mantenimiento)";
+      document.getElementById('res-deficit-info').innerText = deficitPct > 0 ? `(-${Math.round(deficitPct * 100)}% déficit)` : "(Mantenimiento)";
 
       document.getElementById('res-macro-prot').innerText = `${Math.round(protGramos)} g`;
       document.getElementById('res-macro-grasas').innerText = `${Math.round(grasaGramos)} g`;
@@ -530,13 +802,13 @@
       document.getElementById('res-agua').innerText = `${aguaLitros} L / día`;
       document.getElementById('res-tiempo').innerText = tiempoTexto;
 
-      // ACTUALIZAR PREGUNTAS FRECUENTES PERSONALIZADAS
-      document.getElementById('faq-t3').innerText = `¿Cómo entrenar en Zona 2 (${z2Min} a ${z2Max} ppm)?`;
-      document.getElementById('faq-t4').innerText = `¿Cómo repartir mis ${Math.round(protGramos)}g de proteína y macros?`;
+      // Personalizar preguntas frecuentes
+      document.getElementById('faq-t3').innerText = `❓ ¿Cómo entrenar en Zona 2 (${z2Min} a ${z2Max} ppm)?`;
+      document.getElementById('faq-t4').innerText = `❓ ¿Cómo repartir mis ${Math.round(protGramos)}g de proteína y macros?`;
       document.getElementById('faq-r2').innerHTML = `
-        <p>• <strong class="text-white">TMB (${Math.round(tmb)} Kcal):</strong> Lo que tu cuerpo quema en reposo absoluto solo por mantenerse vivo (respiración, corazón, función cerebral).</p>
-        <p>• <strong class="text-white">GET (${Math.round(get)} Kcal):</strong> Las calorías para mantener tu peso exacto teniendo en cuenta tu actividad física.</p>
-        <p>• <strong class="text-emerald-300">Consumo Sugerido (${Math.round(metaKcal)} Kcal):</strong> Tu meta diaria con ${Math.round(deficitPct * 100)}% de déficit para oxidar grasa sin perder energía.</p>
+        <p>• <strong style="color:#fff;">TMB (${Math.round(tmb)} Kcal):</strong> Calorías mínimas que quema tu organismo en reposo absoluto.</p>
+        <p>• <strong style="color:#fff;">GET (${Math.round(get)} Kcal):</strong> Calorías reales diarias sumando tu nivel de actividad física.</p>
+        <p>• <strong style="color:#6ee7b7;">Consumo Sugerido (${Math.round(metaKcal)} Kcal):</strong> Presupuesto diario con ${Math.round(deficitPct * 100)}% de déficit para oxidar grasa.</p>
       `;
 
       return true;
@@ -544,6 +816,10 @@
 
     function descargarImagen() {
       if (!calcular(true)) return;
+      if (typeof html2canvas === 'undefined') {
+        alert("La librería de imagen aún está cargando. Espera 2 segundos o toma una captura de pantalla.");
+        return;
+      }
 
       const card = document.getElementById('card-render');
       html2canvas(card, {
